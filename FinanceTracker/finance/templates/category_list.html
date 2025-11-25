@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Categories</h2>
+
+<a href="{% url 'category_add' %}" class="btn btn-success mb-3">+ Add Category</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for c in categories %}
+    <tr>
+        <td>{{ c.name }}</td>
+        <td>
+            <a href="{% url 'category_edit' c.id %}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{% url 'category_delete' c.id %}" class="btn btn-danger btn-sm">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

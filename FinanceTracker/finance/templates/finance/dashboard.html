@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Your Dashboard</h2>
+  <div>
+    <form method="get" class="d-flex">
+      <input type="month" id="monthPicker" class="form-control" style="width:200px;"
+             value="{{ selected_year }}-{{ selected_month|stringformat:'02d' }}">
+    </form>
+  </div>
+</div>
+
+<!-- Quick totals -->
+<div class="row mb-3">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Total Income (selected month)</h6>
+      <h4>₹{{ total_income }}</h4>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Total Expenses (selected month)</h6>
+      <h4>₹{{ total_expenses }}</h4>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Balance</h6>
+      <h4>₹{{ balance }}</h4>
+    </div>
+  </div>
+</div>
+
+{% if budget_alerts %}
+<div class="alert alert-warning">
+  <strong>Budget Alerts:</strong>
+  <ul>
+    {% for a in budget_alerts %}
+      <li>{{ a.category }}: Spent ₹{{ a.spent }} / Limit ₹{{ a.limit }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5>Recent Expenses</h5>
+      <div>
+        <a class="btn btn-success btn-sm" href="{% url 'finance:add_expense' %}">+ Add Expense</a>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'finance:add_income' %}">+ Add Income</a>
+      </div>
+    </div>
+
+    <div class="list-group mb-3">
+      {% for exp in recent_expenses %}
+      <div class="list-group-item d-flex justify-content-between">
+        <div>
+          <strong>{{ exp.title }}</strong><br>
+          <small>{{ exp.date }} • {{ exp.category }}</small>
+          <p class="mb-0">{{ exp.notes|truncatechars:80 }}</p>
+        </div>
+        <div class="text-end">
+          <h5>₹{{ exp.amount }}</h5>
+          <div class="mt-2">
+            <a href="{% url 'finance:edit_expense' exp.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            <a href="{% url 'finance:delete_expense' exp.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="alert alert-info">No recent expenses</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3 p-3">
+      <h6>Breakdown by Category</h6>
+      <canvas id="breakdownChart"></canvas>
+    </div>
+
+    <div class="card p-3">
+      <h6>Budgets</h6>
+      <a href="{% url 'finance:manage_budgets' %}" class="btn btn-sm btn-outline-secondary">Manage Budgets</a>
+    </div>
+
+    <div class="card p-3 mt-3">
+      <h6>Reference Recording</h6>
+      <small>Local video you uploaded (open/play locally)</small>
+      <div class="mt-2">
+        <!-- local path to your uploaded screen recording -->
+        <a href="{{ video_path }}" class="btn btn-sm btn-outline-primary" target="_blank">Open Recording</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const picker = document.getElementById('monthPicker');
+  if (picker){
+    picker.addEventListener('change', function(){
+      const [y,m] = this.value.split('-');
+      const params = new URLSearchParams(window.location.search);
+      params.set('month', parseInt(m));
+      params.set('year', parseInt(y));
+      window.location.search = params.toString();
+    });
+  }
+
+  const breakdown = {{ breakdown|safe }};
+  const labels = breakdown.map(b => b.category);
+  const data = breakdown.map(b => b.total);
+
+  const ctx = document.getElementById('breakdownChart');
+  if (ctx){
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{ data: data }]
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
