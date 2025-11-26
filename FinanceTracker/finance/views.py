@@ -8,7 +8,8 @@ from django.contrib.auth import login
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
- 
+from django.db import models
+from django.urls import reverse 
 
 def register_view(request):
     if request.method == "POST":
@@ -19,7 +20,7 @@ def register_view(request):
     else:
         form = UserCreationForm()
 
-    return render(request, "register.html", {"form": form})
+    return render(request, "finance/register.html", {"form": form})
 
 
 @login_required
@@ -96,7 +97,7 @@ def dashboard(request):
 @login_required
 def expense_list(request):
     expenses = Expense.objects.filter(user=request.user).order_by('-date')
-    return render(request, 'expense_list.html', {'expenses': expenses})
+    return render(request, 'finance/expense_list.html', {'expenses': expenses})
 
 @login_required
 def add_expense(request):
@@ -110,7 +111,7 @@ def add_expense(request):
             return redirect('finance:expense_list')
     else:
         form = ExpenseForm()
-    return render(request, 'expense_form.html', {'form': form, 'title': 'Add Expense'})
+    return render(request, 'finance/expense_form.html', {'form': form, 'title': 'Add Expense'})
 
 @login_required
 def edit_expense(request, pk):
@@ -123,7 +124,7 @@ def edit_expense(request, pk):
             return redirect('finance:expense_list')
     else:
         form = ExpenseForm(instance=exp)
-    return render(request, 'expense_form.html', {'form': form, 'title': 'Edit Expense'})
+    return render(request, 'finance/expense_form.html', {'form': form, 'title': 'Edit Expense'})
 
 @login_required
 def delete_expense(request, pk):
@@ -132,13 +133,13 @@ def delete_expense(request, pk):
         exp.delete()
         messages.success(request, "Expense deleted.")
         return redirect('finance:expense_list')
-    return render(request, 'confirm_delete.html', {'object': exp})
+    return render(request, 'finance/confirm_delete.html', {'object': exp})
 
 # ---------- Income CRUD ----------
 @login_required
 def income_list(request):
     incomes = Income.objects.filter(user=request.user).order_by('-date')
-    return render(request, 'income_list.html', {'incomes': incomes})
+    return render(request, 'finance/income_list.html', {'incomes': incomes})
 
 @login_required
 def add_income(request):
@@ -152,7 +153,7 @@ def add_income(request):
             return redirect('finance:income_list')
     else:
         form = IncomeForm()
-    return render(request, 'income_form.html', {'form': form, 'title': 'Add Income'})
+    return render(request, 'finance/income_form.html', {'form': form, 'title': 'Add Income'})
 
 @login_required
 def edit_income(request, pk):
@@ -165,7 +166,7 @@ def edit_income(request, pk):
             return redirect('finance:income_list')
     else:
         form = IncomeForm(instance=inc)
-    return render(request, 'income_form.html', {'form': form, 'title': 'Edit Income'})
+    return render(request, 'finance/income_form.html', {'form': form, 'title': 'Edit Income'})
 
 @login_required
 def delete_income(request, pk):
@@ -174,13 +175,13 @@ def delete_income(request, pk):
         inc.delete()
         messages.success(request, "Income deleted.")
         return redirect('finance:income_list')
-    return render(request, 'confirm_delete.html', {'object': inc})
+    return render(request, 'finance/confirm_delete.html', {'object': inc})
 
 # ---------- Category CRUD ----------
 @login_required
 def category_list(request):
     cats = Category.objects.filter(user=request.user).order_by('name')
-    return render(request, 'category_list.html', {'categories': cats})
+    return render(request, 'finance/category_list.html', {'categories': cats})
 
 @login_required
 def add_category(request):
@@ -194,7 +195,7 @@ def add_category(request):
             return redirect('finance:category_list')
     else:
         form = CategoryForm()
-    return render(request, 'category_form.html', {'form': form, 'title': 'Add Category'})
+    return render(request, 'finance/category_form.html', {'form': form, 'title': 'Add Category'})
 
 @login_required
 def edit_category(request, pk):
@@ -207,7 +208,7 @@ def edit_category(request, pk):
             return redirect('finance:category_list')
     else:
         form = CategoryForm(instance=cat)
-    return render(request, 'category_form.html', {'form': form, 'title': 'Edit Category'})
+    return render(request, 'finance/category_form.html', {'form': form, 'title': 'Edit Category'})
 
 @login_required
 def delete_category(request, pk):
@@ -216,7 +217,7 @@ def delete_category(request, pk):
         cat.delete()
         messages.success(request, "Category deleted.")
         return redirect('finance:category_list')
-    return render(request, 'confirm_delete.html', {'object': cat})
+    return render(request, 'finance/confirm_delete.html', {'object': cat})
 
 # ---------- Budgets ----------
 @login_required

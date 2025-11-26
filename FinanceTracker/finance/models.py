@@ -54,4 +54,7 @@ class Budget(models.Model):
     def __str__(self):
         if self.year and self.month:
             return f"{self.user} - {self.category.name} ({self.month}/{self.year})"
-        return f"{self.user} - {self.category.name} (General)"
+        return f"{self.user} - {self.category.name} (General)" 
+    
+
+    
